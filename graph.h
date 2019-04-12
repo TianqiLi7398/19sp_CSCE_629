@@ -19,6 +19,12 @@ public:
     int heapLoc;
 };
 
+class edge{
+public:
+    int weight;
+    vector<int> nodes;
+};
+
 void printVec(std::vector<int> const &input)
 {
     for (int i = 0; i < input.size(); i++) {
@@ -36,17 +42,23 @@ void printGraph(vector<vertex> graph){
     }
 }
 
-void makeEdge(vector<vertex>& graph, int a, int b){
+void makeEdge(vector<vertex>& graph, int a, int b, vector<edge>& Edge){
     graph[a].neighbor.push_back(b);
     graph[b].neighbor.push_back(a);
     int weight = random()%10;
     graph[a].weight.push_back(weight);
     graph[b].weight.push_back(weight);
 
+    // add edge to edge set
+    edge new_edge;
+    new_edge.weight = weight;
+    new_edge.nodes.push_back(a);
+    new_edge.nodes.push_back(b);
+    Edge.push_back(new_edge);
 }
 
 // generate the sparse graph
-vector<vertex> G1(int nov, int average_degree){
+vector<vertex> G1(int nov, int average_degree, vector<edge>& Edge){
     std::vector<vertex> graph;
     // initialize the vertices and make a circle
     vertex Avertex;
@@ -55,10 +67,10 @@ vector<vertex> G1(int nov, int average_degree){
         vertex Avertex;
         graph.push_back(Avertex);
         // make edge for i-1 and i
-        makeEdge(graph, i-1, i);
+        makeEdge(graph, i-1, i, Edge);
 
     }
-    makeEdge(graph, 0, nov-1);
+    makeEdge(graph, 0, nov-1, Edge);
 
     // after a circle is generated, the # of rest edges to create is
     int num_edges = (average_degree - 2) * nov / 2;
@@ -79,7 +91,7 @@ vector<vertex> G1(int nov, int average_degree){
             continue;
         }
         else{
-            makeEdge(graph, a, b);
+            makeEdge(graph, a, b, Edge);
             num_edges--;
         }
 
@@ -87,7 +99,7 @@ vector<vertex> G1(int nov, int average_degree){
     return graph;
 };
 
-vector<vertex> G2(int nov, float percantage){
+vector<vertex> G2(int nov, float percantage, vector<edge>& Edge){
     std::vector<vertex> graph;
     // initialize the vertices and make a circle
     vertex Avertex;
@@ -96,10 +108,10 @@ vector<vertex> G2(int nov, float percantage){
         vertex Avertex;
         graph.push_back(Avertex);
         // make edge for i-1 and i
-        makeEdge(graph, i-1, i);
+        makeEdge(graph, i-1, i, Edge);
 
     }
-    makeEdge(graph, 0, nov-1);
+    makeEdge(graph, 0, nov-1, Edge);
 
     // after the circle is generated, for each vertex it should have percantage% * nov neighbors
     int edge_num = floor(percantage * nov);
@@ -124,7 +136,7 @@ vector<vertex> G2(int nov, float percantage){
                 continue;
             }
             else{
-                makeEdge(graph, a, i);
+                makeEdge(graph, a, i, Edge);
                 // edge_num--;
             }
         }
