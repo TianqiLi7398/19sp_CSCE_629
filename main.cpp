@@ -72,10 +72,43 @@ int main()
     edgeMaxheap edgeHeap;
     edgeHeap.edgeMaxheapInit(Edge);
     edgeHeap.Heapsort();
-    for (i = 0; i < edgeHeap.edgeHeap.size(); i++){
-        cout<<edgeHeap.edgeHeap[i].weight<<" ";
-    }
+    // for (i = 0; i < edgeHeap.edgeHeap.size(); i++){
+    //     cout<<edgeHeap.edgeHeap[i].weight<<" ";
+    // }
     cout<<endl;
+
+    edgeHeap.Makeset(graph);
+    vector<edge> mst;
+
+    for (i = edgeHeap.edgeHeap.size()-1; i >=0; i--){
+        edge r12 = edgeHeap.edgeHeap[i];
+        int v1 = edgeHeap.edgeHeap[i].nodes[0];
+        int v2 = edgeHeap.edgeHeap[i].nodes[1];
+        int r1 = find(v1, graph);
+        int r2 = find(v2, graph);
+        if (r1 != r2){
+            Union(r1, r2, graph);
+            mst.push_back(r12);
+        }
+    }
+
+    // get the max spanning tree
+
+    vector<vertex> graph_mst = Build_MST(mst);
+
+    // find the path from s to t
+    int bw = 100;
+    int path_length = 0;
+    vector<int> path(graph.size() + 1);
+    path[0] = bw;
+    cout<<"everything all right before calculation "<<path.size()<<" "<<endl;
+    vector<int> pathKrus = DFS_findpath(graph_mst, s,t, path, path_length);
+    cout<<"finish??"<<endl;
+    printVec(pathKrus);
+
+
+
+
 
 
     return 0;

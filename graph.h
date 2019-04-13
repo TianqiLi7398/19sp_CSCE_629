@@ -17,6 +17,7 @@ public:
     int parent;
     string status;
     int heapLoc;
+    int level;
 };
 
 class edge{
