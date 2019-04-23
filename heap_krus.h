@@ -39,7 +39,6 @@ public:
     // to extract the root which is the minimum element
     int extractMax(vector<vertex> graph);
 
-
     void BuildMaxHeap();
 
     void MaxHeapify(int i);
@@ -150,7 +149,7 @@ vector<int> DFS_findpath(vector<vertex>& mst, int s, int t, const vector<int> pa
 
         DFS_findpath(mst, w, t, copy_path, copy_path_length);
     }
-};
+}
 
 vector<vertex> Build_MST(vector<edge>& mst){
     vector<vertex> graph_mst;
