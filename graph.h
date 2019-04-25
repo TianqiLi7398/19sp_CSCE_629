@@ -4,6 +4,8 @@
 #include<list>
 #include <algorithm>
 #include <cmath>
+#include <ctime>
+#include <cstdlib>
 
 
 using namespace std;
@@ -18,6 +20,7 @@ public:
     string status;
     int heapLoc;
     int level;
+
 };
 
 class edge{
@@ -44,9 +47,11 @@ void printGraph(vector<vertex> graph){
 }
 
 void makeEdge(vector<vertex>& graph, int a, int b, vector<edge>& Edge){
+    srand(time(0));
     graph[a].neighbor.push_back(b);
     graph[b].neighbor.push_back(a);
-    int weight = random()%10;
+    int weight = random()%20;
+
     graph[a].weight.push_back(weight);
     graph[b].weight.push_back(weight);
 
@@ -60,6 +65,7 @@ void makeEdge(vector<vertex>& graph, int a, int b, vector<edge>& Edge){
 
 // generate the sparse graph
 vector<vertex> G1(int nov, int average_degree, vector<edge>& Edge){
+
     std::vector<vertex> graph;
     // initialize the vertices and make a circle
     vertex Avertex;
@@ -101,6 +107,7 @@ vector<vertex> G1(int nov, int average_degree, vector<edge>& Edge){
 };
 
 vector<vertex> G2(int nov, float percantage, vector<edge>& Edge){
+
     std::vector<vertex> graph;
     // initialize the vertices and make a circle
     vertex Avertex;

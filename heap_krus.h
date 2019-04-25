@@ -5,6 +5,7 @@
 #include <algorithm>
 #include <cmath>
 #include<climits>
+#include<stack>
 
 
 using namespace std;
@@ -58,8 +59,8 @@ void edgeMaxheap::edgeMaxheapInit(vector<edge>& Edge){
 }
 
 void edgeMaxheap::BuildMaxHeap(){
-    cout<<"the volum of edges: "<<edgeHeap.size()<<endl;
-    for (int i = heapsize/2 - 1; i >= 0; i --){
+    // cout<<"the volum of edges: "<<edgeHeap.size()<<endl;
+    for (int i = heapsize/2 ; i >= 0; i --){
         MaxHeapify(i);
     }
 }
@@ -67,15 +68,15 @@ void edgeMaxheap::BuildMaxHeap(){
 void edgeMaxheap::MaxHeapify(int i){
     int l = left(i);
     int r = right(i);
-    int largest;
-    if (l <= heapsize && edgeHeap[l].weight > edgeHeap[i].weight){
+    int largest = i;
+    if (l < heapsize && edgeHeap[l].weight > edgeHeap[i].weight){
         largest = l;
     }
     else{
         largest = i;
     }
 
-    if (r <= heapsize && edgeHeap[r].weight > edgeHeap[largest].weight){
+    if (r < heapsize && edgeHeap[r].weight > edgeHeap[largest].weight){
         largest = r;
     }
 
@@ -87,7 +88,6 @@ void edgeMaxheap::MaxHeapify(int i){
 
 void edgeMaxheap::Heapsort(){
     BuildMaxHeap();
-
     for (int i = edgeHeap.size() - 1; i > 0; i--){
         swap(0, i);
         heapsize--;
@@ -108,7 +108,7 @@ void edgeMaxheap::Makeset(vector<vertex>& graph){
     }
 }
 
-int find(int v, vector<vertex>& graph){
+int find(int& v, vector<vertex>& graph){
     int w = v;
     while (graph[w].parent != -1){
         w = graph[w].parent;
@@ -116,7 +116,7 @@ int find(int v, vector<vertex>& graph){
     return w;
 }
 
-void Union(int r1, int r2, vector<vertex>& graph){
+void Union(int& r1, int& r2, vector<vertex>& graph){
     if (graph[r1].level > graph[r2].level){
         graph[r2].parent = r1;
     }
@@ -127,45 +127,102 @@ void Union(int r1, int r2, vector<vertex>& graph){
         graph[r1].parent = r2;
         graph[r2].level++;
     }
-
 }
 
-vector<int> DFS_findpath(vector<vertex>& mst, int s, int t, const vector<int> path, const int path_length){
+void DFS_findpath(vector<vertex*> mst, int v, int t, vector<int> path){
+    // cout<<"dfs in "<<copy_path_length<<" const "<<path_length<<endl;
+    if (v == t){
+        cout<<"The max bandwidth is "<<path[0]<<endl;
+        path.erase(path.begin());
+        cout<<"path found: ";
+        printVec(path);
+        cout<<endl;
+        return;
+    }
+    mst[v]->status = "black";
+    // cout<<" get in, node "<<v;
 
-    int copy_path_length = path_length;
-    copy_path_length++;
-    vector<int> copy_path = path;
-
-    int bw = copy_path[0];
-    cout<<"dfs in "<<copy_path_length<<" const "<<path_length<<endl;
-    for (int i = 0; i < mst[s].neighbor.size(); i++){
+    for (int i = 0; i < mst[v]->neighbor.size(); i++){
         // wait
-        int w = mst[s].neighbor[i];
-        copy_path[0] = min(mst[s].weight[i], bw);
-        copy_path[copy_path_length] = w;
-        if (w == t){
-            return copy_path;
+        int w = mst[v]->neighbor[i];
+        if (mst[w]->status == "white"){
+            vector<int> copy_path = path;
+            int bw = copy_path[0];
+            // cout<<w;
+            copy_path[0] = min(mst[v]->weight[i], bw);
+            copy_path.push_back(w);
+            DFS_findpath(mst, w, t, copy_path);
         }
 
-        DFS_findpath(mst, w, t, copy_path, copy_path_length);
     }
+
 }
 
-vector<vertex> Build_MST(vector<edge>& mst){
-    vector<vertex> graph_mst;
-    for (int i = 0; i < 2 * mst.size(); i++){
-        vertex node;
+
+// void new_DFS(vector<vertex>& mst, int v, int t, stack<int>& path, vector<int>& flag){
+//     if (v == t){
+//         return;
+//     }
+//
+//     if (flag[v] == 0){
+//         path.push(v);
+//     }
+//
+//     int temp;
+//     if (flag[v] < mst[v].neighbor.size()){
+//         temp = mst[v].neighbor[flag[v]];
+//         flag[v]++;
+//         new_DFS(mst, temp, t, path, flag);
+//     }
+//     else{
+//         path.pop();
+//         if(!path.empty()){
+//             temp = path.top();
+//             new_DFS(mst, temp, t, path, flag);
+//         }
+//     }
+// }
+
+vector<vertex *> Build_MST(vector<edge>& mst){
+    vector<vertex*> graph_mst;
+    for (int i = 0; i < mst.size() + 1; i++){
+        vertex *node = new vertex;
         graph_mst.push_back(node);
+
     }
 
-    for (i = 0; i < mst.size(); i++){
+    for (i = 0; i < mst.size() ; i++){
+
         edge newedge = mst[i];
-        graph_mst[newedge.nodes[0]].weight.push_back(newedge.weight);
-        graph_mst[newedge.nodes[0]].neighbor.push_back(newedge.nodes[1]);
-        graph_mst[newedge.nodes[1]].weight.push_back(newedge.weight);
-        graph_mst[newedge.nodes[1]].neighbor.push_back(newedge.nodes[0]);
+        graph_mst[newedge.nodes[0]]->weight.push_back(newedge.weight);
+        graph_mst[newedge.nodes[0]]->neighbor.push_back(newedge.nodes[1]);
+        graph_mst[newedge.nodes[1]]->weight.push_back(newedge.weight);
+        graph_mst[newedge.nodes[1]]->neighbor.push_back(newedge.nodes[0]);
+        graph_mst[newedge.nodes[0]]->status = "white";
+        graph_mst[newedge.nodes[1]]->status = "white";
     }
-
     return graph_mst;
 }
+
+// vector<vertex> Build_MST(vector<edge>& mst){
+//     vector<vertex> graph_mst;
+//     for (int i = 0; i < mst.size(); i++){
+//         vertex node;
+//         graph_mst.push_back(node);
+//     }
+//     cout<<"go to build edges"<<endl;
+//     for (i = 0; i < mst.size() - 1; i++){
+//         cout<<i<<endl;
+//         edge newedge = mst[i];
+//         graph_mst[newedge.nodes[0]].weight.push_back(newedge.weight);
+//         graph_mst[newedge.nodes[0]].neighbor.push_back(newedge.nodes[1]);
+//         graph_mst[newedge.nodes[1]].weight.push_back(newedge.weight);
+//         graph_mst[newedge.nodes[1]].neighbor.push_back(newedge.nodes[0]);
+//         graph_mst[newedge.nodes[0]].status = "white";
+//         graph_mst[newedge.nodes[1]].status = "white";
+//     }
+//     cout<<"finish build edges"<<endl;
+//     return graph_mst;
+// }
+
 // the function to swap two values

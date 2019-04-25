@@ -20,43 +20,30 @@ using namespace std::chrono;
 
 int main()
 {
-    int s,t;
-    s = 5;
-    t = 100;
+
     int num_vertex = 5000;
     int average_degree = 6;
     float percantage = 0.2;
     vector<int> source;
     vector<int> target;
+
     for (int i = 1; i < 6; i++){
         source.push_back(i*10);
-        target.push_back(i*300);
+        target.push_back(i*3);
     }
 
-
+    for (int j = 0; j < 11; j++){
 
 
     vector<edge> Edge;
 
-
+    vector<vertex> graph_;
     /* Problem 1, generate 2 graphs */
     vector<vertex> graph = G1(num_vertex,average_degree, Edge);
     // vector<vertex> graph = G2(num_vertex, percantage, Edge);
-    vector<vertex> graph1 = graph;
-    vector<vertex> graph2 = graph;
+
     vector<vertex> graph3 = graph;
-    // vector<vertex> graph = G2(num_vertex, percantage);
-    // printGraph(graph2);
-    cout<<"graph built!"<<endl;
-    cout<<"edge size"<<Edge.size()<<endl;
-    // check neighbor number
-    int num_degree = 0;
-    for (i = 0; i < num_vertex; i++){
-        num_degree += graph3[i].neighbor.size();
-    }
-
-
-    // Problem 2.a, use Dijkstra to find path of MB
+    cout<<j<<endl;
 
     printf("============================================");
     cout<<endl;
@@ -64,19 +51,14 @@ int main()
     cout<<endl;
     auto start1 = high_resolution_clock::now();
 
-    vector<int> path1 = Dijkstra(s, t, graph1);
-
+    for (int k = 0; k < 5; k++ ){
+        graph_ = graph;
+        vector<int> path1 = Dijkstra(source[k], target[k], graph_);
+    }
     auto stop1 = high_resolution_clock::now();
+    auto duration1 = duration_cast<microseconds>(stop1 - start1)/1000;
+    cout<<"time spent on this method: "<<duration1.count()<<endl;
 
-    printf("path found: ");
-    printVec(path1);
-    cout<<endl;
-    auto duration = duration_cast<microseconds>(stop1 - start1);
-    cout<<"time spent on this method: "<<duration.count()<<endl;
-
-
-    // Problem 2.b, applying heap data structure to decrase time complexity of
-    // Dijkstra ALG.
 
     printf("============================================");
     cout<<endl;
@@ -85,22 +67,17 @@ int main()
     cout<<endl;
 
     auto start2 = high_resolution_clock::now();
-
-    vector<int> path2 = Dijkstra_heap(s, t, graph2);
+    for (int k = 0; k < 5; k++ ){
+        graph_ = graph;
+        vector<int> path1 = Dijkstra_heap(source[k], target[k], graph_);
+    }
 
     auto stop2 = high_resolution_clock::now();
 
-    printf("path found: ");
-    printVec(path2);
-    cout<<endl;
-
-    auto duration2 = duration_cast<microseconds>(stop2 - start2);
+    auto duration2 = duration_cast<microseconds>(stop2 - start2)/1000;
     cout<<"time spent on this method: "<<duration2.count()<<endl;
 
 
-
-
-    // Problem 2.c, applying Kruskal's algorithm to get MST and then find the path
     printf("============================================");
     cout<<endl;
 
@@ -128,24 +105,31 @@ int main()
             mst.push_back(r12);
         }
     }
-    cout<<"size of mst:"<<mst.size()<<endl;
     // get the max spanning tree
 
-    vector<vertex*> graph_mst = Build_MST(mst);
 
+
+
+    // vector<vertex*> graph_mst = Build_MST(mst);
     // find the path from s to t by a DFS
     int bw = 100;
+    vector<int> path_, path;
+    for (int k = 0; k < 5; k++){
+        vector<edge>mst_ = mst;
+        vector<vertex*> graph_mst = Build_MST(mst_);
+        path = path_;
+        path.push_back(bw);
+        path.push_back(source[k]);
+        DFS_findpath(graph_mst, source[k],target[k], path);
+    }
 
-    vector<int> path;
-    path.push_back(bw);
-    path.push_back(s);
-    DFS_findpath(graph_mst, s,t, path);
 
     auto stop3 = high_resolution_clock::now();
-    auto duration3 = duration_cast<microseconds>(stop3 - start3);
     // printVec(path_vec);
+    auto duration3 = duration_cast<microseconds>(stop3 - start3)/1000;
     cout<<"time spent on this method: "<<duration3.count()<<endl;
 
 
+}
     return 0;
 }
